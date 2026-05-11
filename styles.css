@@ -1337,3 +1337,515 @@ body {
     grid-template-columns: 1fr;
   }
 }
+
+.choice-key {
+  width: 38px;
+  height: 38px;
+  display: grid !important;
+  place-items: center;
+  border-radius: 10px;
+  color: #102036 !important;
+  background: linear-gradient(180deg, #ffd24a, #ffb02e);
+  font-weight: 900;
+  box-shadow: inset 0 -4px rgba(16, 24, 32, 0.12);
+}
+
+.animated-scene {
+  isolation: isolate;
+  min-height: 380px;
+}
+
+.animated-scene > * {
+  position: absolute;
+  z-index: 2;
+}
+
+.skyline,
+.room-wall,
+.road-path,
+.story-road,
+.field-row,
+.kitchen-counter {
+  inset: auto 0 0;
+  z-index: 1;
+}
+
+.house-shape {
+  left: 18%;
+  bottom: 76px;
+  width: 150px;
+  height: 125px;
+  border-radius: 10px 10px 6px 6px;
+  background: linear-gradient(160deg, #ffd28a, #d99455);
+  box-shadow: 0 18px 28px rgba(16, 24, 32, 0.15);
+}
+
+.house-shape::before {
+  content: "";
+  position: absolute;
+  left: -14px;
+  top: -52px;
+  width: 178px;
+  height: 100px;
+  background: #e94e3f;
+  clip-path: polygon(50% 0, 100% 56%, 88% 67%, 50% 25%, 12% 67%, 0 56%);
+}
+
+.house-shape span {
+  position: absolute;
+  left: 24px;
+  bottom: 0;
+  width: 44px;
+  height: 66px;
+  border-radius: 8px 8px 0 0;
+  background: #795548;
+}
+
+.hero-kid {
+  left: 43%;
+  bottom: 72px;
+  font-size: 70px;
+  animation: braveStep 2.4s ease-in-out infinite;
+}
+
+.sneaky-thief {
+  right: 18%;
+  bottom: 76px;
+  font-size: 82px;
+  animation: sneak 3s ease-in-out infinite;
+  filter: drop-shadow(0 14px 18px rgba(16, 24, 32, 0.24));
+}
+
+.alert-mark {
+  right: 27%;
+  top: 82px;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--bad);
+  font-size: 28px;
+  font-weight: 900;
+  animation: pulseAlert 1s ease-in-out infinite;
+}
+
+.wallet-object {
+  left: 44%;
+  bottom: 86px;
+  font-size: 78px;
+  animation: walletGlow 1.6s ease-in-out infinite;
+}
+
+.money-spark {
+  padding: 8px 10px;
+  border-radius: 999px;
+  color: #0b5b42;
+  background: rgba(255, 255, 255, 0.88);
+  font-weight: 900;
+  animation: floatMoney 2s ease-in-out infinite;
+}
+
+.money-spark.s1 {
+  left: 36%;
+  top: 96px;
+}
+
+.money-spark.s2 {
+  right: 31%;
+  top: 128px;
+  animation-delay: 0.4s;
+}
+
+.police-post {
+  right: 16%;
+  bottom: 74px;
+  font-size: 78px;
+}
+
+.mess {
+  font-size: 58px;
+  animation: clutterBounce 1.8s ease-in-out infinite;
+}
+
+.mess.m1 {
+  left: 24%;
+  bottom: 86px;
+}
+
+.mess.m2 {
+  left: 48%;
+  bottom: 118px;
+  animation-delay: 0.2s;
+}
+
+.mess.m3 {
+  right: 22%;
+  bottom: 82px;
+  animation-delay: 0.38s;
+}
+
+.broom-sweep {
+  left: 35%;
+  bottom: 70px;
+  font-size: 76px;
+  animation: sweep 2.2s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+.grandma {
+  left: 22%;
+  bottom: 76px;
+  font-size: 86px;
+  animation: gentleBob 2s ease-in-out infinite;
+}
+
+.basket {
+  right: 22%;
+  bottom: 68px;
+  font-size: 72px;
+}
+
+.falling-fruit {
+  font-size: 46px;
+  animation: fruitFall 2.2s ease-in-out infinite;
+}
+
+.falling-fruit.f1 {
+  left: 46%;
+  top: 62px;
+}
+
+.falling-fruit.f2 {
+  left: 56%;
+  top: 48px;
+  animation-delay: 0.35s;
+}
+
+.falling-fruit.f3 {
+  left: 64%;
+  top: 80px;
+  animation-delay: 0.7s;
+}
+
+.court-building {
+  left: 19%;
+  bottom: 72px;
+  font-size: 108px;
+}
+
+.judge-scale {
+  right: 22%;
+  bottom: 92px;
+  font-size: 94px;
+  animation: scaleTilt 2.4s ease-in-out infinite;
+}
+
+.evidence-card,
+.bribe-card {
+  top: 86px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  color: #102036;
+  background: #fff;
+  font-weight: 900;
+  box-shadow: 0 16px 26px rgba(16, 24, 32, 0.15);
+}
+
+.evidence-card {
+  left: 38%;
+  animation: evidenceSlide 2.3s ease-in-out infinite;
+}
+
+.bribe-card {
+  right: 27%;
+  color: #fff;
+  background: var(--bad);
+  animation: bribeReject 2.3s ease-in-out infinite;
+}
+
+.story-road {
+  height: 44%;
+  background: linear-gradient(90deg, #3f4d5b 0 48%, #ffd24a 48% 52%, #3f4d5b 52% 100%);
+}
+
+.story-bike {
+  left: 12%;
+  bottom: 82px;
+  font-size: 76px;
+  animation: bikeMove 3s linear infinite;
+}
+
+.story-light {
+  right: 20%;
+  bottom: 154px;
+  font-size: 72px;
+  animation: gentleBob 1.8s ease-in-out infinite;
+}
+
+.traffic-cone {
+  right: 34%;
+  bottom: 86px;
+  font-size: 56px;
+}
+
+.poster-board {
+  left: 34%;
+  bottom: 78px;
+  width: 210px;
+  height: 145px;
+  display: grid;
+  place-items: center;
+  border: 8px solid #2457c5;
+  border-radius: 14px;
+  color: #102036;
+  background: #fff;
+  font-size: 30px;
+  font-weight: 900;
+  text-align: center;
+  box-shadow: 0 20px 34px rgba(16, 24, 32, 0.16);
+}
+
+.puzzle-piece {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  color: #102036;
+  background: var(--yellow);
+  font-weight: 900;
+  animation: puzzleDrift 2.4s ease-in-out infinite;
+}
+
+.puzzle-piece.p1 {
+  left: 22%;
+  top: 84px;
+}
+
+.puzzle-piece.p2 {
+  right: 26%;
+  top: 76px;
+  animation-delay: 0.3s;
+}
+
+.puzzle-piece.p3 {
+  right: 18%;
+  bottom: 88px;
+  animation-delay: 0.6s;
+}
+
+.kitchen-counter {
+  height: 34%;
+  background: linear-gradient(180deg, #b87b50, #855338);
+}
+
+.chef {
+  left: 24%;
+  bottom: 82px;
+  font-size: 92px;
+  animation: chefCook 2.2s ease-in-out infinite;
+}
+
+.order-bubble {
+  width: 62px;
+  height: 62px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #fff;
+  font-size: 34px;
+  box-shadow: 0 14px 26px rgba(16, 24, 32, 0.14);
+  animation: orderPop 2s ease-in-out infinite;
+}
+
+.order-bubble.o1 {
+  left: 48%;
+  top: 78px;
+}
+
+.order-bubble.o2 {
+  left: 61%;
+  top: 116px;
+  animation-delay: 0.32s;
+}
+
+.order-bubble.o3 {
+  right: 18%;
+  top: 82px;
+  animation-delay: 0.64s;
+}
+
+.field-row {
+  height: 42%;
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0 16px, transparent 16px 52px),
+    linear-gradient(180deg, #8f6d4e, #6f4f34);
+}
+
+.farmer {
+  left: 23%;
+  bottom: 86px;
+  font-size: 90px;
+  animation: farmerWork 2s ease-in-out infinite;
+}
+
+.plant-grow {
+  bottom: 82px;
+  font-size: 54px;
+  animation: plantGrow 2.2s ease-in-out infinite;
+}
+
+.plant-grow.g1 {
+  left: 50%;
+}
+
+.plant-grow.g2 {
+  left: 60%;
+  animation-delay: 0.35s;
+}
+
+.plant-grow.g3 {
+  left: 70%;
+  animation-delay: 0.7s;
+}
+
+@keyframes sneak {
+  0%,
+  100% {
+    transform: translateX(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateX(-56px) rotate(3deg);
+  }
+}
+
+@keyframes braveStep {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(24px);
+  }
+}
+
+@keyframes pulseAlert {
+  50% {
+    transform: scale(1.16);
+    box-shadow: 0 0 0 12px rgba(216, 77, 69, 0.14);
+  }
+}
+
+@keyframes walletGlow {
+  50% {
+    transform: translateY(-8px) rotate(-4deg);
+    filter: drop-shadow(0 0 18px rgba(255, 210, 74, 0.9));
+  }
+}
+
+@keyframes floatMoney {
+  50% {
+    transform: translateY(-18px);
+  }
+}
+
+@keyframes clutterBounce {
+  50% {
+    transform: translateY(-12px) rotate(6deg);
+  }
+}
+
+@keyframes sweep {
+  0%,
+  100% {
+    transform: translateX(0) rotate(-18deg);
+  }
+  50% {
+    transform: translateX(130px) rotate(24deg);
+  }
+}
+
+@keyframes gentleBob {
+  50% {
+    transform: translateY(-9px);
+  }
+}
+
+@keyframes fruitFall {
+  0% {
+    transform: translateY(-10px);
+    opacity: 0.7;
+  }
+  70% {
+    transform: translateY(150px) rotate(120deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(150px) rotate(120deg);
+    opacity: 0;
+  }
+}
+
+@keyframes scaleTilt {
+  50% {
+    transform: rotate(8deg);
+  }
+}
+
+@keyframes evidenceSlide {
+  50% {
+    transform: translateX(34px) rotate(3deg);
+  }
+}
+
+@keyframes bribeReject {
+  50% {
+    transform: translateX(26px) rotate(12deg);
+    opacity: 0.45;
+  }
+}
+
+@keyframes bikeMove {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(560px);
+  }
+}
+
+@keyframes puzzleDrift {
+  50% {
+    transform: translateY(18px) rotate(8deg);
+  }
+}
+
+@keyframes chefCook {
+  50% {
+    transform: rotate(-7deg) translateY(-8px);
+  }
+}
+
+@keyframes orderPop {
+  50% {
+    transform: translateY(-16px) scale(1.08);
+  }
+}
+
+@keyframes farmerWork {
+  50% {
+    transform: rotate(7deg) translateX(14px);
+  }
+}
+
+@keyframes plantGrow {
+  0%,
+  100% {
+    transform: scale(0.86);
+  }
+  50% {
+    transform: scale(1.18) translateY(-10px);
+  }
+}

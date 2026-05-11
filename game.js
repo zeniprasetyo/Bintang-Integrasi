@@ -278,15 +278,15 @@ function renderStory() {
           <span>Stage ${state.current + 1}</span>
           <strong>${stage.value}</strong>
         </div>
-        <div class="story-art"><div class="scene-emoji">${stage.scene}</div></div>
+        ${renderAnimatedScene(stage.game)}
         <div class="dialogue">${stage.story}</div>
         <div class="choice-grid">
           <button class="choice" data-action="good-choice">
-            <span>✅</span>
+            <span class="choice-key">A</span>
             <span><strong>${stage.good}</strong><span>${stage.goodDetail}</span></span>
           </button>
           <button class="choice" data-action="bad-choice">
-            <span>❌</span>
+            <span class="choice-key">B</span>
             <span><strong>${stage.bad}</strong><span>${stage.badDetail}</span></span>
           </button>
         </div>
@@ -300,6 +300,90 @@ function renderStory() {
       </aside>
     </section>
   `;
+}
+
+function renderAnimatedScene(type) {
+  const scenes = {
+    action: `
+      <div class="story-art animated-scene scene-action">
+        <div class="skyline"></div>
+        <div class="house-shape"><span></span></div>
+        <div class="hero-kid">🧑‍🎓</div>
+        <div class="sneaky-thief">🥷</div>
+        <div class="alert-mark">!</div>
+      </div>
+    `,
+    hidden: `
+      <div class="story-art animated-scene scene-hidden">
+        <div class="road-path"></div>
+        <div class="wallet-object">💼</div>
+        <div class="money-spark s1">Rp</div>
+        <div class="money-spark s2">100jt</div>
+        <div class="police-post">🏢</div>
+      </div>
+    `,
+    clean: `
+      <div class="story-art animated-scene scene-clean">
+        <div class="room-wall"></div>
+        <div class="mess m1">🧦</div>
+        <div class="mess m2">📚</div>
+        <div class="mess m3">🗑️</div>
+        <div class="broom-sweep">🧹</div>
+      </div>
+    `,
+    fruit: `
+      <div class="story-art animated-scene scene-fruit">
+        <div class="grandma">👵</div>
+        <div class="basket">🧺</div>
+        <div class="falling-fruit f1">🍎</div>
+        <div class="falling-fruit f2">🍌</div>
+        <div class="falling-fruit f3">🍊</div>
+      </div>
+    `,
+    court: `
+      <div class="story-art animated-scene scene-court">
+        <div class="court-building">🏛️</div>
+        <div class="judge-scale">⚖️</div>
+        <div class="evidence-card e1">BUKTI</div>
+        <div class="bribe-card">SUAP</div>
+      </div>
+    `,
+    traffic: `
+      <div class="story-art animated-scene scene-traffic">
+        <div class="story-road"></div>
+        <div class="story-bike">🛵</div>
+        <div class="story-light">🚦</div>
+        <div class="traffic-cone">🚧</div>
+      </div>
+    `,
+    puzzle: `
+      <div class="story-art animated-scene scene-puzzle">
+        <div class="poster-board">ANTI<br/>KORUPSI</div>
+        <div class="puzzle-piece p1">1</div>
+        <div class="puzzle-piece p2">2</div>
+        <div class="puzzle-piece p3">3</div>
+      </div>
+    `,
+    orders: `
+      <div class="story-art animated-scene scene-orders">
+        <div class="kitchen-counter"></div>
+        <div class="chef">👩‍🍳</div>
+        <div class="order-bubble o1">🍚</div>
+        <div class="order-bubble o2">🍲</div>
+        <div class="order-bubble o3">🥤</div>
+      </div>
+    `,
+    farm: `
+      <div class="story-art animated-scene scene-farm">
+        <div class="field-row"></div>
+        <div class="farmer">🧑‍🌾</div>
+        <div class="plant-grow g1">🌱</div>
+        <div class="plant-grow g2">🌿</div>
+        <div class="plant-grow g3">🌾</div>
+      </div>
+    `,
+  };
+  return scenes[type] || `<div class="story-art animated-scene"><div class="scene-emoji">★</div></div>`;
 }
 
 function renderGame() {
