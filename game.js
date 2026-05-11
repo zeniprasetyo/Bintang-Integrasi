@@ -145,6 +145,10 @@ const state = {
   totalStars: 0,
   timer: 0,
   timerId: null,
+  score: 0,
+  lives: 3,
+  combo: 1,
+  lastRun: null,
   gameData: {},
 };
 
@@ -171,6 +175,8 @@ function renderTopbar() {
       </div>
       <div class="hud">
         <div class="pill">⭐ ${state.totalStars}/27</div>
+        <div class="pill" id="scorePill">Skor ${state.score}</div>
+        <div class="pill" id="livesPill">Nyawa ${renderHearts()}</div>
         <div class="pill">📍 ${state.current + 1}/${stages.length}</div>
         <div class="pill" id="timerPill">⏱️ ${formatTime(state.timer)}</div>
       </div>
@@ -282,6 +288,9 @@ function renderGame() {
       </div>
       <div class="status-line">
         <span class="tag">Target: <strong id="progressText">0</strong></span>
+        <span class="tag">Skor: <strong id="runScore">${state.score}</strong></span>
+        <span class="tag">Kombo: <strong id="comboText">x${state.combo}</strong></span>
+        <span class="tag danger">Nyawa: <strong id="lifeText">${renderHearts()}</strong></span>
         <span class="tag">Waktu: <strong id="liveTime">${formatTime(state.timer)}</strong></span>
       </div>
       <div class="game-board" id="gameBoard">${renderGameBoard(stage.game)}</div>
@@ -330,6 +339,11 @@ function renderSuccess() {
     <section class="panel result">
       <h2>⭐ ${stage.value} Berhasil!</h2>
       <div class="ending-rank">${earned} dari 3 bintang</div>
+      <div class="performance-grid">
+        <span>Skor <strong>${state.lastRun?.score || 0}</strong></span>
+        <span>Waktu <strong>${formatTime(state.lastRun?.time || 0)}</strong></span>
+        <span>Sisa nyawa <strong>${state.lastRun?.lives || 0}</strong></span>
+      </div>
       <p>${stage.moral}</p>
       <div class="action-row" style="justify-content:center">
         <button class="btn good" data-action="next-stage">${state.current === stages.length - 1 ? "Lihat Hasil Akhir" : "Lanjut Perjalanan"}</button>
@@ -345,6 +359,11 @@ function renderBadEnding() {
     <section class="panel result">
       <h2>Perjalanan Terhenti</h2>
       <p>${stage.failText}</p>
+      ${
+        state.lastRun
+          ? `<div class="performance-grid"><span>Skor <strong>${state.lastRun.score}</strong></span><span>Waktu <strong>${formatTime(state.lastRun.time)}</strong></span><span>Sisa nyawa <strong>${state.lastRun.lives}</strong></span></div>`
+          : ""
+      }
       <div class="ending-rank">Nilai yang diuji: ${stage.value}</div>
       <div class="action-row" style="justify-content:center">
         <button class="btn good" data-action="restart-stage">Coba Pilihan Baik</button>
@@ -409,6 +428,7 @@ function handleAction(action, data = {}) {
   } else if (action === "good-choice") {
     state.screen = "game";
   } else if (action === "bad-choice") {
+    state.lastRun = null;
     state.screen = "bad";
   } else if (action === "restart-stage") {
     state.screen = "story";
@@ -424,6 +444,10 @@ function handleAction(action, data = {}) {
   } else if (action === "reset") {
     state.current = 0;
     state.totalStars = 0;
+    state.score = 0;
+    state.lives = 3;
+    state.combo = 1;
+    state.lastRun = null;
     state.stars = Array(stages.length).fill(0);
     state.screen = "start";
   }
@@ -432,6 +456,10 @@ function handleAction(action, data = {}) {
 
 function setupMiniGame(type) {
   state.timer = 0;
+  state.score = 0;
+  state.lives = 3;
+  state.combo = 1;
+  state.lastRun = null;
   state.gameData = {};
   updateTimerText();
 
@@ -450,16 +478,25 @@ function setupTargets(items, total, deadline) {
   const board = document.querySelector("#gameBoard");
   state.gameData = { found: 0, total, deadline };
   board.innerHTML = "";
-  items.forEach((emoji, index) => {
+  const traps = stages[state.current].game === "fruit" ? ["💣", "🪨", "🧃"] : ["💰", "❌", "🕳️"];
+  [...items, ...traps].forEach((emoji, index) => {
     const target = document.createElement("button");
-    target.className = "target";
+    const isTrap = index >= items.length;
+    target.className = `target ${isTrap ? "trap" : ""}`;
     target.textContent = emoji;
     target.style.left = `${8 + ((index * 17) % 74)}%`;
     target.style.top = `${12 + ((index * 23) % 58)}%`;
+    target.style.animationDelay = `${index * 0.18}s`;
     target.addEventListener("click", () => {
       if (target.classList.contains("hit")) return;
+      if (isTrap) {
+        target.classList.add("hit");
+        loseLife("Objek salah");
+        return;
+      }
       target.classList.add("hit");
       state.gameData.found += 1;
+      addScore(120, "fokus");
       updateProgress(`${state.gameData.found}/${total}`);
       if (state.gameData.found >= total) finishMiniGame(deadline);
     });
@@ -490,10 +527,16 @@ function setupHidden() {
     target.style.top = `${22 + ((index * 19) % 58)}%`;
     target.addEventListener("click", () => {
       const match = needed.find((item) => item.emoji === emoji);
-      if (!match || target.classList.contains("hit")) return;
+      if (target.classList.contains("hit")) return;
+      if (!match) {
+        target.classList.add("hit");
+        loseLife("Bukan bukti");
+        return;
+      }
       target.classList.add("hit");
       document.querySelector(`[data-label="${match.label}"]`).classList.add("found");
       state.gameData.found += 1;
+      addScore(150, "bukti");
       updateProgress(`${state.gameData.found}/${needed.length}`);
       if (state.gameData.found === needed.length) finishMiniGame(38);
     });
@@ -524,6 +567,7 @@ function setupDragClean() {
     item.classList.add("done");
     drop.appendChild(item);
     state.gameData.moved += 1;
+    addScore(110, "rapi");
     updateProgress(`${state.gameData.moved}/${items.length}`);
     if (state.gameData.moved === items.length) finishMiniGame(45);
   });
@@ -544,9 +588,15 @@ function setupCourt() {
     card.className = "case-card";
     card.innerHTML = `<strong>${item.good ? "Bukti Kuat" : "Tawaran Curang"}</strong><p>${item.text}</p><button class="btn secondary">Pilih</button>`;
     card.querySelector("button").addEventListener("click", () => {
-      if (!item.good || card.classList.contains("selected")) return;
+      if (card.classList.contains("selected")) return;
+      if (!item.good) {
+        card.classList.add("wrong");
+        loseLife("Keputusan bias");
+        return;
+      }
       card.classList.add("selected");
       state.gameData.selected += 1;
+      addScore(180, "adil");
       updateProgress(`${state.gameData.selected}/2 bukti benar`);
       if (state.gameData.selected === 2) finishMiniGame(45);
     });
@@ -571,17 +621,23 @@ function setupTraffic() {
     road.appendChild(object);
     let y = -65;
     const fall = setInterval(() => {
+      if (state.screen !== "game" || stages[state.current].game !== "traffic") {
+        clearInterval(fall);
+        object.remove();
+        return;
+      }
       y += 8;
       object.style.top = `${y}px`;
       if (y > 270 && y < 330 && Number(object.dataset.lane) === state.gameData.lane) {
         clearInterval(fall);
         object.remove();
-        finishBadTraffic();
+        loseLife("Tabrakan");
       }
       if (y > 410) {
         clearInterval(fall);
         object.remove();
         state.gameData.safe += 1;
+        addScore(80, "aman");
         updateProgress(`${state.gameData.safe}/${state.gameData.total} rintangan`);
         if (state.gameData.safe >= state.gameData.total) finishMiniGame(36);
       }
@@ -608,9 +664,9 @@ function finishBadTraffic() {
 
 function setupPuzzle() {
   const grid = document.querySelector("#puzzleGrid");
-  state.gameData = { tiles: [1, 2, 3, 4, 5, 6, 7, null, 8], deadline: 50 };
+  state.gameData = { tiles: [1, 5, 2, 4, null, 3, 7, 8, 6], deadline: 50, moves: 0, maxMoves: 32 };
   renderPuzzle(grid);
-  updateProgress("Susun 1-8");
+  updateProgress("0/32 langkah");
 }
 
 function renderPuzzle(grid) {
@@ -631,28 +687,41 @@ function moveTile(index) {
   if (!neighbors.includes(index)) return;
   if ((index === empty - 1 || index === empty + 1) && !sameRow) return;
   [state.gameData.tiles[index], state.gameData.tiles[empty]] = [state.gameData.tiles[empty], state.gameData.tiles[index]];
+  state.gameData.moves += 1;
+  addScore(25, "langkah");
+  updateProgress(`${state.gameData.moves}/${state.gameData.maxMoves} langkah`);
   renderPuzzle(document.querySelector("#puzzleGrid"));
+  if (state.gameData.moves > state.gameData.maxMoves) {
+    loseLife("Terlalu banyak langkah");
+    state.gameData.moves = 0;
+  }
   if (state.gameData.tiles.join(",") === "1,2,3,4,5,6,7,8,") finishMiniGame(50);
 }
 
 function setupOrders() {
   const orders = [
-    { name: "Nasi sehat", icon: "🍚" },
-    { name: "Sup hangat", icon: "🍲" },
-    { name: "Air minum", icon: "🥤" },
-    { name: "Buah segar", icon: "🍎" },
+    { name: "Nasi sehat", icon: "🍚", action: "Masak" },
+    { name: "Sup hangat", icon: "🍲", action: "Sajikan" },
+    { name: "Air minum", icon: "🥤", action: "Antar" },
+    { name: "Buah segar", icon: "🍎", action: "Cuci" },
   ];
   const grid = document.querySelector("#orderGrid");
-  state.gameData = { done: 0, total: orders.length, deadline: 42 };
-  orders.forEach((order) => {
+  state.gameData = { done: 0, total: orders.length, deadline: 42, next: 0 };
+  orders.forEach((order, index) => {
     const card = document.createElement("article");
     card.className = "order-card";
-    card.innerHTML = `<strong>${order.icon} ${order.name}</strong><p>Layani dengan benar.</p><button class="btn secondary">Selesaikan</button>`;
+    card.innerHTML = `<strong>${order.icon} ${order.name}</strong><p>Urutan ${index + 1}: ${order.action} dulu.</p><button class="btn secondary">${order.action}</button>`;
     card.querySelector("button").addEventListener("click", () => {
       if (card.classList.contains("selected")) return;
+      if (index !== state.gameData.next) {
+        loseLife("Urutan salah");
+        return;
+      }
       card.classList.add("selected");
       card.querySelector("button").textContent = "Selesai";
       state.gameData.done += 1;
+      state.gameData.next += 1;
+      addScore(140, "tuntas");
       updateProgress(`${state.gameData.done}/${orders.length} pesanan`);
       if (state.gameData.done === orders.length) finishMiniGame(42);
     });
@@ -673,11 +742,20 @@ function renderFarm(grid) {
   state.gameData.plots.forEach((level, index) => {
     const plot = document.createElement("button");
     plot.className = "farm-plot";
-    plot.textContent = ["", "🌱", "🌿", "🌾"][level];
+    const isWeed = index === 4;
+    plot.classList.toggle("weed", isWeed && level < 3);
+    plot.textContent = isWeed && level < 3 ? "🪨" : ["", "🌱", "🌿", "🌾"][level];
     plot.title = "Klik untuk tanam, siram, dan panen";
     plot.addEventListener("click", () => {
+      if (isWeed && state.gameData.plots[index] < 2) {
+        state.gameData.plots[index] += 1;
+        loseLife("Batu harus disingkirkan");
+        renderFarm(grid);
+        return;
+      }
       state.gameData.plots[index] = Math.min(3, state.gameData.plots[index] + 1);
       const grown = state.gameData.plots.filter((value) => value === 3).length;
+      addScore(45, "rawat");
       updateProgress(`${grown}/9 panen`);
       renderFarm(grid);
       if (grown === 9) finishMiniGame(55);
@@ -728,10 +806,82 @@ function updateProgress(text) {
   if (progress) progress.textContent = text;
 }
 
+function renderHearts() {
+  return `${"♥".repeat(Math.max(0, state.lives))}${"♡".repeat(Math.max(0, 3 - state.lives))}`;
+}
+
+function addScore(points, label = "Benar") {
+  state.score += points * state.combo;
+  state.combo = Math.min(5, state.combo + 1);
+  updateMeters();
+  showFloat(`+${points} ${label}`, "good");
+}
+
+function loseLife(reason = "Salah") {
+  state.lives -= 1;
+  state.combo = 1;
+  updateMeters();
+  showFloat(reason, "bad");
+  const board = document.querySelector("#gameBoard");
+  if (board) {
+    board.classList.remove("shake");
+    void board.offsetWidth;
+    board.classList.add("shake");
+  }
+  if (state.lives <= 0) finishChallengeFailed();
+}
+
+function updateMeters() {
+  const runScore = document.querySelector("#runScore");
+  const scorePill = document.querySelector("#scorePill");
+  const combo = document.querySelector("#comboText");
+  const life = document.querySelector("#lifeText");
+  const livesPill = document.querySelector("#livesPill");
+  if (runScore) runScore.textContent = state.score;
+  if (scorePill) scorePill.textContent = `Skor ${state.score}`;
+  if (combo) combo.textContent = `x${state.combo}`;
+  if (life) life.textContent = renderHearts();
+  if (livesPill) livesPill.textContent = `Nyawa ${renderHearts()}`;
+}
+
+function showFloat(text, tone) {
+  const board = document.querySelector("#gameBoard");
+  if (!board) return;
+  const note = document.createElement("div");
+  note.className = `float-note ${tone}`;
+  note.textContent = text;
+  note.style.left = `${18 + Math.random() * 58}%`;
+  note.style.top = `${18 + Math.random() * 48}%`;
+  board.appendChild(note);
+  setTimeout(() => note.remove(), 850);
+}
+
+function finishChallengeFailed() {
+  stopTimer();
+  state.lastRun = {
+    won: false,
+    score: state.score,
+    time: state.timer,
+    lives: Math.max(0, state.lives),
+  };
+  state.screen = "bad";
+  render();
+}
+
 function finishMiniGame(deadline) {
-  const stars = state.timer <= deadline * 0.55 ? 3 : state.timer <= deadline ? 2 : 1;
+  const speedBonus = state.timer <= deadline * 0.6 ? 1 : 0;
+  const lifeBonus = state.lives >= 2 ? 1 : 0;
+  const scoreBonus = state.score >= 450 ? 1 : 0;
+  const stars = Math.max(1, Math.min(3, speedBonus + lifeBonus + scoreBonus));
   state.stars[state.current] = Math.max(state.stars[state.current], stars);
   state.totalStars = state.stars.reduce((sum, value) => sum + value, 0);
+  state.lastRun = {
+    won: true,
+    score: state.score,
+    time: state.timer,
+    lives: state.lives,
+    stars,
+  };
   state.screen = "success";
   render();
 }
