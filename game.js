@@ -197,6 +197,7 @@ function renderScreen() {
 function renderStart() {
   return `
     <section class="hero">
+      <div class="hero-ribbon">Misi Festival Anti Korupsi</div>
       <div class="hero-scene">
         <div class="hero-copy">
           <div class="eyebrow">Hari Anti Korupsi</div>
@@ -206,6 +207,13 @@ function renderStart() {
             <button class="btn good" data-action="start">▶ Mulai Perjalanan</button>
             <button class="btn secondary" data-action="map">▦ Lihat Peta Nilai</button>
           </div>
+        </div>
+        <div class="cover-character" aria-hidden="true">
+          <span class="hero-avatar">🧑‍🎓</span>
+          <span class="hero-badge">★</span>
+          <span class="hero-orbit a">⚖️</span>
+          <span class="hero-orbit b">🛡️</span>
+          <span class="hero-orbit c">🌾</span>
         </div>
         <div class="hero-card">
           <div class="hero-stat"><span>⭐</span><div><strong>27 bintang maksimal</strong><span>Skor dari waktu dan ketepatan</span></div></div>
@@ -222,6 +230,18 @@ function renderMap() {
     <section class="panel">
       <h2>Peta Perjalanan</h2>
       <p class="game-instructions">Kumpulkan bintang dari tiap nilai integritas. Stage berikutnya terbuka setelah kamu memilih jalan yang benar.</p>
+      <div class="route-track">
+        ${stages
+          .map(
+            (stage, index) => `
+              <div class="route-node ${index < state.current ? "done" : ""} ${index === state.current ? "active" : ""}">
+                <span>${index + 1}</span>
+                <strong>${stage.value}</strong>
+              </div>
+            `
+          )
+          .join("")}
+      </div>
       <div class="map-grid">
         ${stages
           .map((stage, index) => {
@@ -254,6 +274,10 @@ function renderStory() {
   return `
     <section class="stage-layout">
       <div class="panel">
+        <div class="chapter-head">
+          <span>Stage ${state.current + 1}</span>
+          <strong>${stage.value}</strong>
+        </div>
         <div class="story-art"><div class="scene-emoji">${stage.scene}</div></div>
         <div class="dialogue">${stage.story}</div>
         <div class="choice-grid">
@@ -282,9 +306,12 @@ function renderGame() {
   const stage = stages[state.current];
   return `
     <section class="panel game-area">
-      <div>
-        <h2>${stage.icon} Mini-game ${stage.value}</h2>
-        <p class="game-instructions">${getGameInstruction(stage.game)}</p>
+      <div class="game-titlebar">
+        <div>
+          <span>Challenge ${state.current + 1}</span>
+          <h2>${stage.icon} ${stage.value}</h2>
+        </div>
+        <p>${getGameInstruction(stage.game)}</p>
       </div>
       <div class="status-line">
         <span class="tag">Target: <strong id="progressText">0</strong></span>

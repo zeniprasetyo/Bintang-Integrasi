@@ -30,6 +30,7 @@ const server = http.createServer((request, response) => {
 
     response.writeHead(200, {
       "Content-Type": types[path.extname(filePath)] || "text/plain; charset=utf-8",
+      "Cache-Control": "no-store",
     });
     response.end(data);
   });
